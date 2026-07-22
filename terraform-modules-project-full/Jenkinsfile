@@ -1,25 +1,80 @@
 pipeline {
+
     agent any
+
     parameters {
-        choice(name:'ACTION', choices:['plan','apply','destroy'], description:'Terraform action')
-        choice(name:'ENV', choices:['dev','qa','prod'], description:'Environment')
+
+        choice(
+            name: 'ACTION',
+            choices: ['plan', 'apply', 'destroy'],
+            description: 'Terraform Action'
+        )
+
+        choice(
+            name: 'ENV',
+            choices: ['prod'],
+            description: 'Environment'
+        )
     }
+
     stages {
-        stage('Checkout'){ steps{ checkout scm } }
-        stage('Init'){ steps{ sh 'terraform init' } }
-        stage('Validate'){ steps{ sh 'terraform validate' } }
-        stage('Action'){
-            steps{
-                script{
-                    if(params.ACTION=='plan'){
-                        sh "terraform plan -var-file=${params.ENV}.tfvars"
-                    } else if(params.ACTION=='apply'){
-                        sh "terraform apply -auto-approve -var-file=${params.ENV}.tfvars"
-                    } else {
-                        sh "terraform destroy -auto-approve -var-file=${params.ENV}.tfvars"
-                    }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir('terraform-modules-project-full') {
+                    sh 'terraform init'
                 }
             }
         }
+
+        stage('Terraform Validate') {
+            steps {
+                dir('terraform-modules-project-full') {
+                    sh 'terraform validate'
+                }
+            }
+        }
+
+        stage('Terraform Action') {
+
+            steps {
+
+                dir('terraform-modules-project-full') {
+
+                    script {
+
+                        if(params.ACTION=="plan"){
+
+                            sh "terraform plan -var-file=${params.ENV}.tfvars"
+
+                        }
+
+                        if(params.ACTION=="apply"){
+
+                            sh "terraform apply -auto-approve -var-file=${params.ENV}.tfvars"
+
+                        }
+
+                        if(params.ACTION=="destroy"){
+
+                            sh "terraform destroy -auto-approve -var-file=${params.ENV}.tfvars"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
+
 }
