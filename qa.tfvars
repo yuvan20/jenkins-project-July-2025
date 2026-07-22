@@ -1,7 +1,0 @@
-aws_region="ap-south-1"
-environment="qa"
-vpc_cidr="10.1.0.0/16"
-public_subnet_cidr="10.1.1.0/24"
-availability_zone="ap-south-1a"
-ami_id="ami-xxxxxxxxxxxxxxxxx"
-instance_type="t3.micro"
